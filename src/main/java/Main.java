@@ -31,20 +31,42 @@ public class Main {
             System.out.println("Error: exception while reading dictionary file. " + e.toString());
             e.printStackTrace();
         }
-
+        generateWords(args[0]);
+        System.out.println("Generated: " + Integer.toString(generatedWords.size()));
+        for(String s:generatedWords) {
+            System.out.println(s);
+        }
     }
     static Set<String> generatedWords = new HashSet<>();
     static void generateWords(String inputCharacters) {
-        StringBuffer wordInProgress = new StringBuffer();
-        for(int length = 2; length < inputCharacters.length(); length++) {
+        StringBuilder wordInProgress = new StringBuilder();
+        for(int length = 2; length <= inputCharacters.length(); length++) {
             for (int i = 0; i < inputCharacters.length(); i++) {
                 wordInProgress.setLength(0);
                 wordInProgress.append(inputCharacters.charAt(i));
-
+                //not the most efficient, but it will do for the small strings we are likely to be dealing with here
+                String remainingCharacters = inputCharacters.substring(0,i) + inputCharacters.substring(i+1);
+                generateWords(wordInProgress, remainingCharacters, length);
             }
         }
     }
-    static void generateWords(String inputCharacters, int wordLength) {
-
+    static void generateWords(StringBuilder partial, String inputCharacters, int wordLength) {
+        int currentLength = partial.length();
+        for (int i = 0; i < inputCharacters.length(); i++) {
+            //erase any other characters added
+            partial.setLength(currentLength);
+            partial.append(inputCharacters.charAt(i));
+            if(partial.length() == wordLength) {
+                String curWord = partial.toString().toUpperCase();
+                if(wordList.contains(curWord)) {
+                    generatedWords.add(curWord);
+                }
+            }
+            else {
+                //not the most efficient, but it will do for the small strings we are likely to be dealing with here
+                String remainingCharacters = inputCharacters.substring(0, i) + inputCharacters.substring(i + 1);
+                generateWords(partial, remainingCharacters, wordLength);
+            }
+        }
     }
 }
